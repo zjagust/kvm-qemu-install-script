@@ -42,7 +42,7 @@ function setOptions () {
 		${SPACER}
 		${B}${I}KVM QEMU AUTO INSTALLER SCRIPT${R}
 		${I}This script has multiple options. Documentation available at:${R}
-		${B}https://github.com/zjagust ${R}
+		${B}https://github.com/zjagust/kvm-qemu-install-script ${R}
 		${B}https://zacks.eu/kvm-qemu-installation-configuration ${R}
 		${SPACER}
 		The following options are available:
@@ -434,7 +434,7 @@ function kvmInstall () {
 	echo "${I}## INSTALLATION COMPLETE ##${R}"
 	echo "${SPACER}"
 	echo "For any additional information, please visit:"
-	echo "${B}https://github.com/zjagust ${R}"
+	echo "${B}https://github.com/zjagust/kvm-qemu-install-script ${R}"
 	echo "${B}https://zacks.eu/kvm-qemu-installation-configuration ${R}"
 	echo "${SPACER}"
 }
