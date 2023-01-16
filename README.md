@@ -14,10 +14,10 @@ $> kvm-qemu-autoinstall
 ## Options
 Script has several options (parameters), and without supplying one it will just display help documentation. Following are the parameters:
 
--h: Print this help message<br>
--r: Check system readiness<br>
--n: Check how to enable Nesting (if -r shows it's disabled)<br>
--z: Check how to disable Zone Reclaim Mode (if -r shows it's enabled)<br>
--s: Check swappiness recommendations for your system<br>
--d: Check I/O scheduler recommendations for your disk devices<br>
--i: Install KVM QEMU. Recommended to run -r first<br>
+ -h: Print this help message<br>
+ -r: Check system readiness<br>
+ -n: Check how to enable Nesting (if -r shows it's disabled)<br>
+ -z: Check how to disable Zone Reclaim Mode (if -r shows it's enabled)<br>
+ -s: Check swappiness recommendations for your system<br>
+ -d: Check I/O scheduler recommendations for your disk devices<br>
+ -i: Install KVM QEMU. Recommended to run -r first<br>
