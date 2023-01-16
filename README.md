@@ -4,11 +4,10 @@ This repository contains a script that will install KVM and QEMU. Script is inte
 [KVM QEMU Installation & Configuration Guide](https://zacks.eu/kvm-qemu-installation-configuration)
 
 ## Installation
-Clone this repository (or download zip file) and and execute the script by appending **sudo bash** (i.e., sudo bash kvm-qemu-autoinstall.sh). You can also copy the script to one of executable paths and tun it from anywhere:
+Clone this repository (or download zip file) and and execute the script by appending **sudo bash** (i.e., sudo bash kvm-qemu-autoinstall.sh). You can also copy the script to one of executable paths and run it from anywhere:
 
-<code>
-sudo cp kvm-qemu-autoinstall.sh /usr/local/sbin/kvm-qemu-autoinstall
-</code>
+<code>sudo cp kvm-qemu-autoinstall.sh /usr/local/sbin/kvm-qemu-autoinstall  
+kvm-qemu-autoinstall</code>
 
 ## Options
 Script has several options (parameters), and without supplying one it will just display help documentation. Following are the parameters:
