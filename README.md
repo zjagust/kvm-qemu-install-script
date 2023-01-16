@@ -6,7 +6,10 @@ This repository contains a script that will install KVM and QEMU. Script is inte
 ## Installation
 Clone this repository (or download zip file) and and execute the script by appending **sudo bash** (i.e., sudo bash kvm-qemu-autoinstall.sh). You can also copy the script to one of executable paths and run it from anywhere:
 
-<code>> sudo cp kvm-qemu-autoinstall.sh /usr/local/sbin/kvm-qemu-autoinstall<br>> kvm-qemu-autoinstall</code>
+<code>
+> sudo cp kvm-qemu-autoinstall.sh /usr/local/sbin/kvm-qemu-autoinstall<br>
+> kvm-qemu-autoinstall
+</code>
 
 ## Options
 Script has several options (parameters), and without supplying one it will just display help documentation. Following are the parameters:
