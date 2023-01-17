@@ -60,7 +60,7 @@ function setOptions () {
 ############################
 ## SET REQUIRED VARIABLES ##
 ############################
-INSTALL_USER=$(whoami)
+INSTALL_USER="$SUDO_USER"
 VIRT_CORES=$(grep -E -c '(vmx|svm)' /proc/cpuinfo)
 CPU_ARCH=$(grep -E -c ' lm ' /proc/cpuinfo)
 KERNEL_BUILD=$(uname -m)
