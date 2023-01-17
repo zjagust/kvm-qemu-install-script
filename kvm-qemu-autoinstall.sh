@@ -60,6 +60,7 @@ function setOptions () {
 ############################
 ## SET REQUIRED VARIABLES ##
 ############################
+INSTALL_USER=$(whoami)
 VIRT_CORES=$(grep -E -c '(vmx|svm)' /proc/cpuinfo)
 CPU_ARCH=$(grep -E -c ' lm ' /proc/cpuinfo)
 KERNEL_BUILD=$(uname -m)
@@ -427,6 +428,13 @@ function kvmInstall () {
 				echo "Virtual Manager GUI will not be installed."
 				echo
 			fi
+	fi
+
+	# Add install user to correct groups
+	if [ "$INSTALL_USER" != "root" ]; then
+		usermod -a -G libvirt,kvm "$INSTALL_USER"
+	else
+		echo "User is root, no group additions."
 	fi
 
 	# Display install info message
