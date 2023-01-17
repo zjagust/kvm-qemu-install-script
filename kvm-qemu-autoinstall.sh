@@ -37,7 +37,7 @@ if [[ "$(whoami)" != "root" ]]
 ####################
 function setOptions () {
 
-    # List Options
+  # List Options
 	cat <<-END
 		${SPACER}
 		${B}${I}KVM QEMU AUTO INSTALLER SCRIPT${R}
