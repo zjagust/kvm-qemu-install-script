@@ -368,6 +368,41 @@ function kvmIOScheduler () {
 
 }
 
+function kvmGuestConfig () {
+
+	# Display Info
+	cat <<-END
+
+		${SPACER}
+
+		  ${B}** GUEST BEHAVIOUR ON HOST SHUTDOWN **${R}
+
+		  The default behaviour of libvirtd is to shutdown all guests (VMs) once the host is shut down.
+		  This can be changed to instruct libvirtd to suspend all guests using virsh managedsave.
+
+		${SPACER}
+
+	END
+
+	# Ask for conformation
+	local ANSWER
+	read -rp "Type ${B}Y${R} to change the behaviour for guest machines from shutdown to suspend, or just press Enter to leave the default: ${B}" ANSWER
+	echo "${R}"
+
+	# Change behaviour
+	if [[ "${ANSWER, }" != 'y' ]]; then
+		echo
+		echo "Nothing changed, will continue now."
+		echo
+	else
+		echo
+		echo "Changing default from shutdown to suspend."
+		echo
+		sed -i -e 's/#ON_SHUTDOWN=shutdown/ON_SHUTDOWN=suspend/g' /etc/default/libvirt-guests
+	fi
+
+}
+
 ######################
 ## INSTALL KVM QEMU ##
 ######################
@@ -436,6 +471,9 @@ function kvmInstall () {
 	else
 		echo "User is root, no group additions."
 	fi
+
+	# Action taken on host shutdown
+	kvmGuestConfig
 
 	# Display install info message
 	echo "${SPACER}"
