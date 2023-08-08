@@ -403,6 +403,41 @@ function kvmGuestConfig () {
 
 }
 
+function kvmTCPSocket () {
+
+	# Display Info
+	cat <<-END
+
+		${SPACER}
+
+		  ${B}** LibVirtd TCP Socket **${R}
+
+		  Libvirtd can be started with listening TCP socket. This is usually useful when building a 
+		  "cluster" of libvirt machines and you want to enable a live guest migration between hosts
+		  in that cluster. When enabled, port 16509 will be opened and will listen on all interfaces.
+
+		${SPACER}
+
+	END
+
+	# Ask for conformation
+	local ANSWER
+	read -rp "Type ${B}Y${R} to enable libvirtd TCP socket service, or press Enter to continue without it: ${B}" ANSWER
+	echo "${R}"
+
+	# Enable TCP socket
+	if [[ "${ANSWER, }" != 'y' ]]; then
+		echo
+		echo "Nothing changed, will continue now."
+		echo
+	else
+		echo
+		echo "Enabling libvirtd TCP socket service."
+		systemctl enable libvirtd-tcp.socket
+	fi
+
+}
+
 ######################
 ## INSTALL KVM QEMU ##
 ######################
@@ -474,6 +509,9 @@ function kvmInstall () {
 
 	# Action taken on host shutdown
 	kvmGuestConfig
+
+	# Libvirtd TCP socket
+	kvmTCPSocket
 
 	# Display install info message
 	echo "${SPACER}"
