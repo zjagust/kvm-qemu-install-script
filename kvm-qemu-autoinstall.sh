@@ -452,18 +452,23 @@ function kvmTCPSocket () {
 
 function poolInstall () {
 
+	# Notify
+	echo "${SPACER}"
+	echo "${B} ** Setting dir based pools ** ${R}"
+	echo "${SPACER}"
+
 	# Remove default pools
 	virsh pool-destroy default
 	virsh pool-undefine default
 
 	# Set default pool
-	virsh pool-define-as default dir - - - - "/home/vm_images"
+	virsh pool-define-as default dir - - - - "/home/libvirt/vm_images"
 	virsh pool-build default
 	virsh pool-start default
 	virsh pool-autostart default
 
 	# Set ISO pool
-	virsh pool-define-as iso dir - - - - "/home/iso_images"
+	virsh pool-define-as iso dir - - - - "/home/libvirt/iso_images"
 	virsh pool-build iso
 	virsh pool-start iso
 	virsh pool-autostart iso
@@ -475,6 +480,11 @@ function poolInstall () {
 ######################
 
 function netInstall () {
+
+	# Notify
+	echo "${SPACER}"
+	echo "${B} ** Setting virtual networks ** ${R}"
+	echo "${SPACER}"
 
 	# Remove default network
 	virsh net-destroy default
