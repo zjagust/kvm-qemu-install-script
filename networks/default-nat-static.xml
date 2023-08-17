@@ -1,0 +1,6 @@
+<network>
+  <name>default-nat-static</name>
+  <forward mode='nat'/>
+  <bridge name='virbr1' stp='on' delay='0' />
+  <ip address='172.17.0.1' netmask='255.255.255.0'>
+</network> 
