@@ -368,6 +368,10 @@ function kvmIOScheduler () {
 
 }
 
+#####################
+## GUEST BEHAVIOUR ##
+#####################
+
 function kvmGuestConfig () {
 
 	# Display Info
@@ -403,6 +407,10 @@ function kvmGuestConfig () {
 
 }
 
+#############################
+## ENABLE LISTENING SOCKET ##
+#############################
+
 function kvmTCPSocket () {
 
 	# Display Info
@@ -435,6 +443,60 @@ function kvmTCPSocket () {
 		echo "Enabling libvirtd TCP socket service."
 		systemctl enable libvirtd-tcp.socket
 	fi
+
+}
+
+###################
+## INSTALL POOLS ##
+###################
+
+function poolInstall () {
+
+	# Remove default pools
+	virsh pool-destroy default
+	virsh pool-undefine default
+
+	# Set default pool
+	virsh pool-define-as default dir - - - - "/home/vm_images"
+	virsh pool-build default
+	virsh pool-start default
+	virsh pool-autostart default
+
+	# Set ISO pool
+	virsh pool-define-as iso dir - - - - "/home/iso_images"
+	virsh pool-build iso
+	virsh pool-start iso
+	virsh pool-autostart iso
+
+}
+
+######################
+## INSTALL NETWORKS ##
+######################
+
+function netInstall () {
+
+	# Remove default network
+	virsh net-destroy default
+	virsh net-undefine default
+
+	# Set default NAT network with DHCP
+	curl -Sso /tmp/default-nat-dhcp.xml https://raw.githubusercontent.com/zjagust/kvm-qemu-install-script/main/networks/default-nat-dhcp.xml
+	virsh net-define /tmp/default-nat-dhcp.xml
+	virsh net-autostart default-nat-dhcp
+	virsh net-start default-nat-dhcp
+
+	# Set default NAT static network
+	curl -Sso /tmp/default-nat-static.xml https://raw.githubusercontent.com/zjagust/kvm-qemu-install-script/main/networks/default-nat-static.xml
+	virsh net-define /tmp/default-nat-static.xml
+	virsh net-autostart default-nat-static
+	virsh net-start default-nat-static
+
+	# Set default isolated network
+	curl -Sso /tmp/default-isolated.xml https://raw.githubusercontent.com/zjagust/kvm-qemu-install-script/main/networks/default-isolated.xml
+	virsh net-define /tmp/default-isolated.xml
+	virsh net-autostart default-isolated
+	virsh net-start default-isolated
 
 }
 
@@ -483,7 +545,8 @@ function kvmInstall () {
 	qemu \
 	qemu-system-x86 \
 	qemu-utils \
-	virtinst
+	virtinst \
+	xsltproc
 
 	# Check if desktop
 	if [ "$IS_DESKTOP" == true ];
@@ -523,6 +586,146 @@ function kvmInstall () {
 	echo "${SPACER}"
 }
 
+####################################
+## PRE-INSTALL UTILS SYSTEM CHECK ##
+####################################
+
+function systemChecks () {
+
+	# System Checks Header
+	echo
+	echo "${SPACER}"
+	echo "${B}** MANDATORY SYSTEM CHECKS **${R}"
+	echo "${SPACER}"
+	
+	# Check if libvirtd is running
+	if [[ -f "/var/run/libvirtd.pid" ]]
+	then
+		echo "${I}Libvirtd is installed and running.${R}"
+		sleep 1
+	else
+		echo "${E}Libvirtd is either not running or it is not installed on this machine. Will exit now.${R}"
+		exit 1
+	fi
+
+	# Check if virsh is installed
+	if [[ -f "/usr/bin/virsh" ]]
+	then
+		echo "${I}Virsh is installed.${R}"
+		sleep 1
+	else
+		echo "${E}Cannot find virsh. Looks like libvirt-clients package is not installed. Will exit now.${R}"
+		exit 1
+	fi
+
+	# Check if qemu-img is installed
+	if [[ -f "/usr/bin/qemu-img" ]]
+	then
+		echo "${I}Qemu-img is installed.${R}"
+		sleep 1
+	else
+		echo "${E}Cannot find qemu-img. Looks like qemu-utils package is not installed. Will exit now.${R}"
+		exit 1
+	fi
+
+	# Check if xsltproc is installed
+	if [[ -f "/usr/bin/xsltproc" ]]
+	then
+		echo "${I}Xsltproc is installed.${R}"
+		sleep 1
+	else
+		echo "${E}Cannot find xsltproc. Looks like xsltproc package is not installed. Will exit now.${R}"
+		exit 1
+	fi
+
+	# Check if curl is installed
+	if [[ -f "/usr/bin/curl" ]]
+	then
+		echo "${I}Curl is installed.${R}"
+		sleep 1
+	else
+		echo "${E}Cannot find curl. Looks like curl package is not installed. Will exit now.${R}"
+		exit 1
+	fi
+
+	# Check if ca-certificates is installed
+	CA_CERTS_CHECK=$(dpkg -l | grep ca-certificates | awk '{print $1}')
+	if [[ "$CA_CERTS_CHECK" == "ii" ]]
+	then
+		echo "${I}Ca-certificates are installed.${R}"
+		sleep 1
+	else
+		echo "${E}Cannot confirm ca-certificates installation. Looks like ca-certificates package is not installed. Will exit now.${R}"
+		exit 1
+	fi
+
+	# System Checks Footer
+	echo "${SPACER}"
+
+}
+
+###################
+## INSTALL UTILS ##
+###################
+function utilsInstall () {
+
+	# Display Info
+	cat <<-END
+
+		${SPACER}
+
+		  ${B}** KVM QEMU Helper Scripts **${R}
+
+		  This will install a collection of "helper" scripts compatible with the installation of 
+		  Libvirt/KVM/QEMU performed by this script. New scripts to this bundle may be added 
+		  periodically, as well as updates to the existing ones. For more info, please visit:
+		  https://github.com/zjagust/kvm-qemu-install-script/resources/README.md		  
+
+		${SPACER}
+
+	END
+
+	# Ask for confirmation.
+	local ANSWER
+	read -rp "Type ${B}Y${R} to proceed, or anything else to cancel, and press Enter: ${B}" ANSWER
+	echo "${R}"
+
+	# Terminate if required.
+	if [[ "${ANSWER,}" != 'y' ]]; then
+		echo
+		echo 'Terminated. Nothing done.'
+		echo
+		exit 1
+	fi
+
+	# Prerequisites
+	systemChecks
+
+	# Install kvm-guest-actions script
+	curl -Sso /usr/local/sbin/kvm-guest-actions https://raw.githubusercontent.com/zjagust/kvm-qemu-install-script/main/resources/kvm-guest-actions.sh
+	if [[ "$?" == 0 ]]; then
+		chown root:root /usr/local/sbin/kvm-guest-actions
+		chmod 0755 /usr/local/sbin/kvm-guest-actions
+		echo "${I}Script kvm-guest-actions successfully installed at /usr/local/sbin/kvm-guest-actions.${R}"
+		echo "${I}Run ${B}sudo kvm-guest-actions${R} without any parameters to display available options${R}"
+	else
+		echo "${E}Script installation failed, something went wrong. Will exit now.${R}"
+		exit 1
+	fi
+
+	# Install guest config xml file parser
+	curl -Sso /etc/libvirt/qemu/guest_storage_list.xsl https://raw.githubusercontent.com/zjagust/kvm-qemu-install-script/main/resources/guest_storage_list.xsl
+	if [[ "$?" == 0 ]]; then
+		chown root:root /etc/libvirt/qemu/guest_storage_list.xsl
+		chmod 0644 /etc/libvirt/qemu/guest_storage_list.xsl
+		echo "${I}XML parser guest_storage_list.xsl successfully installed at /etc/libvirt/qemu/guest_storage_list.xsl.${R}"
+	else
+		echo "${E}XML parser file installation failed, something went wrong. Will exit now.${R}"
+		exit 1
+	fi
+
+}
+
 #################
 ## GET OPTIONS ##
 #################
@@ -534,7 +737,7 @@ if [ $# -eq 0 ]; then
 fi
 
 # Execute
-while getopts ":hrnzsdi" option; do
+while getopts ":hrnzsdiu" option; do
 	case $option in
 		h) # Display help message
 			setOptions
@@ -562,7 +765,13 @@ while getopts ":hrnzsdi" option; do
 			exit
 			;;
 		i) # Install KVM QEMU
-			kvmInstall 
+			kvmInstall
+			poolInstall
+			netInstall
+			exit
+			;;
+		u) # Install KVM QEMU utils
+			utilsInstall
 			exit
 			;;
 		\?) # Invalid options
