@@ -11,7 +11,7 @@ This resource contains the script **kvm-guest-actions**, which will install at *
 
 The script has multiple parameters described below (use **sudo** if not root):
 
-* **-H**: Print this help message
+* **-H**: Print help message
     * *-> (usage: kvm-guest-actions -H)*
 * **-S CHANGE GUEST STATE**
   * **-Sd** to show GUEST_NAMES
@@ -36,3 +36,26 @@ The script has multiple parameters described below (use **sudo** if not root):
 * **-N: DISPLAY GUEST NETWORK INFO (interfaces/MACs/IPs)**
   * **-N** GUEST_NAME name to list active interface(s) info
     * *-> (usage: kvm-guest-actions -N GUEST_NAME)*
+
+### Debian Server Unattended Install
+This resource contains the script **kvm-debian-server-unattended**, which will install at */usr/local/sbin/kvm-debian-server-unattended*. Along with the script, the following resources will be set:
+
+* Preseed configuration files **debian-server-dhcp-pressed.cfg** and **debian-server-static-preseed.cfg** will be placed to */etc/libvirt/qemu/preseed* directory.
+* Preseed late-install script **debian-server-late-install.sh** and basic firewall configuration file **basic-firewall** will be place to */etc/libvirt/qemu/late-install* directory.
+* On the first run, **kvm-debian-server-unattended** script will create an inventory file at */etc/libvirt/qemu/installed-guests.csv*.
+
+The script has multiple parameters described below (use **sudo** if not root):
+
+* **-h**: Print help message
+    * *-> (usage: kvm-debian-server-unattended -h)*
+* **-l**: List inventory (all guest machines)
+    * *-> (usage: kvm-debian-server-unattended -l)*
+* **-s**: List supported Debian distributions
+    * *-> (usage: kvm-debian-server-unattended -s)*
+* **-n**: List available virtual networks
+    * *-> (usage: kvm-debian-server-unattended -n)*
+* **-i**: Install Debian Server guest machine
+  * The following parameters must be defined if DHCP network is used: **guest name**, **disk size**, **RAM size**, **VCPU count**, **distro name**, **virtual network name**, **root password** 
+    * *-> (usage: kvm-debian-server-unattended -i debian 10240 2048 2 bookworm default-nat-dhcp passpass)*
+  * The following parameters must be defined if Static network is used: **guest name**, **disk size**, **RAM size**, **VCPU count**, **distro name**, **virtual network name**, **root password**, **static ip address**
+    * *-> (usage: kvm-debian-server-unattended -i debian 10240 2048 2 bookworm default-nat-static passpass 172.17.0.X)*
