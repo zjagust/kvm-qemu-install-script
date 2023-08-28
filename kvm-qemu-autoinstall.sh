@@ -556,7 +556,8 @@ function kvmInstall () {
 	qemu-system-x86 \
 	qemu-utils \
 	virtinst \
-	xsltproc
+	xsltproc \
+	grepcidr
 
 	# Check if desktop
 	if [ "$IS_DESKTOP" == true ];
@@ -586,6 +587,37 @@ function kvmInstall () {
 	# Libvirtd TCP socket
 	kvmTCPSocket
 
+	## ADDITIONAL COMPONENTS - Install and configure webfs
+	# Set host gateway
+	HOST_GATEWAY=$(ip route get "$(ip route show 0.0.0.0/0 | grep -oP 'via \K\S+')" | grep -oP 'src \K\S+')
+	# Install required packages
+	DEBIAN_FRONTEND=noninteractive aptitude install -R -y webfs
+	# Stop WebFS service
+	systemctl stop webfs
+	# Create WebFS directories and set proper ownership
+	mkdir -p /home/webfs/{htdocs,logs}
+	touch /home/webfs/logs/access.log
+	chown -R nobody:nogroup /home/webfs/{htdocs,logs}
+	chown -R nobody:nogroup /var/run/webfs
+	# Set WebFS config
+	if [[ -f "/etc/webfsd.conf" ]]
+	then
+		mv /etc/webfsd.conf /etc/webfsd.conf.dist
+		curl -Sso /etc/webfsd.conf \
+		https://raw.githubusercontent.com/zjagust/kvm-qemu-install-script/main/additional-components/webfsd.conf
+	else
+		curl -Sso /etc/webfsd.conf \
+		https://raw.githubusercontent.com/zjagust/kvm-qemu-install-script/main/additional-components/webfsd.conf
+	fi
+	# Enable and start WebFS service
+	systemctl enable webfs
+	systemctl start webfs
+	# Set firewall
+	iptables -N KVM-SERVICES
+	iptables -I INPUT -m comment --comment "KVM Services" -j KVM-SERVICES
+	iptables -A KVM-SERVICES -p tcp -m tcp -s 172.16.0.0/24 -d "$HOST_GATEWAY" --dport 8880 -m comment --comment "WebFS Access - KVM Default NAT DHCP Network" -j ACCEPT
+	iptables -A KVM-SERVICES -p tcp -m tcp -s 172.17.0.0/24 -d "$HOST_GATEWAY" --dport 8880 -m comment --comment "WebFS Access - KVM Default NAT Static Network" -j ACCEPT
+	
 	# Display install info message
 	echo "${SPACER}"
 	echo "${I}## INSTALLATION COMPLETE ##${R}"
@@ -723,14 +755,25 @@ function utilsInstall () {
 		exit 1
 	fi
 
-	# Install guest config xml file parser
+	# Install guest config xml file parser for storage
 	curl -Sso /etc/libvirt/qemu/guest_storage_list.xsl https://raw.githubusercontent.com/zjagust/kvm-qemu-install-script/main/resources/guest_storage_list.xsl
 	if [[ "$?" == 0 ]]; then
 		chown root:root /etc/libvirt/qemu/guest_storage_list.xsl
 		chmod 0644 /etc/libvirt/qemu/guest_storage_list.xsl
 		echo "${I}XML parser guest_storage_list.xsl successfully installed at /etc/libvirt/qemu/guest_storage_list.xsl.${R}"
 	else
-		echo "${E}XML parser file installation failed, something went wrong. Will exit now.${R}"
+		echo "${E}XML storage parser file installation failed, something went wrong. Will exit now.${R}"
+		exit 1
+	fi
+
+	# Install guest config xml file parser for network
+	curl -Sso /etc/libvirt/qemu/networks/guest_network_list.xsl https://raw.githubusercontent.com/zjagust/kvm-qemu-install-script/main/resources/guest_network_list.xsl
+	if [[ "$?" == 0 ]]; then
+		chown root:root /etc/libvirt/qemu/networks/guest_network_list.xsl
+		chmod 0644 /etc/libvirt/qemu/networks/guest_network_list.xsl
+		echo "${I}XML parser guest_network_list.xsl successfully installed at /etc/libvirt/qemu/networks/guest_network_list.xsl.${R}"
+	else
+		echo "${E}XML network parser file installation failed, something went wrong. Will exit now.${R}"
 		exit 1
 	fi
 
