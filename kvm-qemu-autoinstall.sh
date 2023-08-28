@@ -777,6 +777,70 @@ function utilsInstall () {
 		exit 1
 	fi
 
+	# Install kvm-debian-server-unattended script
+	curl -Sso /usr/local/sbin/kvm-debian-server-unattended https://raw.githubusercontent.com/zjagust/kvm-qemu-install-script/main/resources/kvm-debian-server-unattended.sh
+	if [[ "$?" == 0 ]]; then
+		chown root:root /usr/local/sbin/kvm-debian-server-unattended
+		chmod 0755 /usr/local/sbin/kvm-debian-server-unattended
+		echo "${I}Script kvm-debian-server-unattended successfully installed at /usr/local/sbin/kvm-debian-server-unattended.${R}"
+		echo "${I}Run ${B}sudo kvm-debian-server-unattended${R} without any parameters to display available options${R}"
+	else
+		echo "${E}Script installation failed, something went wrong. Will exit now.${R}"
+		exit 1
+	fi
+
+	# Set preseed files required for kvm-debian-server-unattended
+	if [[ -d /etc/libvirt/qemu/preseed ]]; then
+		curl -Sso /etc/libvirt/qemu/preseed/debian-server-dhcp-preseed.cfg https://raw.githubusercontent.com/zjagust/kvm-qemu-install-script/main/resources/preseed/debian-server-dhcp-preseed.cfg
+		curl -Sso /etc/libvirt/qemu/preseed/debian-server-static-preseed.cfg https://raw.githubusercontent.com/zjagust/kvm-qemu-install-script/main/resources/preseed/debian-server-static-preseed.cfg
+		if [[ "$?" == 0 ]]; then
+			chown root:root /etc/libvirt/qemu/preseed/debian-server-*
+			chmod 0755 /etc/libvirt/qemu/preseed/debian-server-*
+			echo "${I}Debian Server preseed configurations successfully installed at /etc/libvirt/qemu/preseed/debian-server-*-preseed.cfg.${R}"
+		else
+			echo "${E}Script installation failed, something went wrong. Will exit now.${R}"
+			exit 1
+		fi
+	else
+		mkdir -p /etc/libvirt/qemu/preseed/
+		curl -Sso /etc/libvirt/qemu/preseed/debian-server-dhcp-preseed.cfg https://raw.githubusercontent.com/zjagust/kvm-qemu-install-script/main/resources/preseed/debian-server-dhcp-preseed.cfg
+		curl -Sso /etc/libvirt/qemu/preseed/debian-server-static-preseed.cfg https://raw.githubusercontent.com/zjagust/kvm-qemu-install-script/main/resources/preseed/debian-server-static-preseed.cfg
+		if [[ "$?" == 0 ]]; then
+			chown root:root /etc/libvirt/qemu/preseed/debian-server-*
+			chmod 0755 /etc/libvirt/qemu/preseed/debian-server-*
+			echo "${I}Debian Server preseed configurations successfully installed at /etc/libvirt/qemu/preseed/debian-server-*-preseed.cfg.${R}"
+		else
+			echo "${E}Script installation failed, something went wrong. Will exit now.${R}"
+			exit 1
+		fi
+	fi
+
+	# Set Debian Server preseed late-install resources
+	if [[ -d /etc/libvirt/qemu/late-install ]]; then
+		curl -Sso /etc/libvirt/qemu/late-install/debian-server-late-install.sh https://raw.githubusercontent.com/zjagust/kvm-qemu-install-script/main/resources/late-install/debian-server-late-install.sh
+		curl -Sso /etc/libvirt/qemu/late-install/basic-firewall https://raw.githubusercontent.com/zjagust/kvm-qemu-install-script/main/resources/late-install/basic-firewall
+		if [[ "$?" == 0 ]]; then
+			chown root:root /etc/libvirt/qemu/late-install/*
+			chmod 0755 /etc/libvirt/qemu/late-install/*
+			echo "${I}Debian Server preseed late-install resources successfully installed at /etc/libvirt/qemu/late-install/.${R}"
+		else
+			echo "${E}Script installation failed, something went wrong. Will exit now.${R}"
+			exit 1
+		fi
+	else
+		mkdir -p /etc/libvirt/qemu/late-install/
+		curl -Sso /etc/libvirt/qemu/late-install/debian-server-late-install.sh https://raw.githubusercontent.com/zjagust/kvm-qemu-install-script/main/resources/late-install/debian-server-late-install.sh
+		curl -Sso /etc/libvirt/qemu/late-install/basic-firewall https://raw.githubusercontent.com/zjagust/kvm-qemu-install-script/main/resources/late-install/basic-firewall
+		if [[ "$?" == 0 ]]; then
+			chown root:root /etc/libvirt/qemu/late-install/*
+			chmod 0755 /etc/libvirt/qemu/late-install/*
+			echo "${I}Debian Server preseed late-install resources successfully installed at /etc/libvirt/qemu/late-install/.${R}"
+		else
+			echo "${E}Script installation failed, something went wrong. Will exit now.${R}"
+			exit 1
+		fi
+	fi
+
 }
 
 #################

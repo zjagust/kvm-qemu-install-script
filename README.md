@@ -6,10 +6,10 @@ This repository contains a script that will install KVM and QEMU. Script is inte
 ## Installation
 Clone this repository (or download zip file) and and execute the script by appending **sudo bash** (i.e., sudo bash kvm-qemu-autoinstall.sh). You can also copy the script to one of executable paths and run it from anywhere (leave out sudo if running as root):
 
-<code>> sudo cp kvm-qemu-autoinstall.sh /usr/local/sbin/kvm-qemu-autoinstall</code><br>
-<code>> sudo chown root:root /usr/local/sbin/kvm-qemu-autoinstall</code><br>
-<code>> sudo chmod 0755 /usr/local/sbin/kvm-qemu-autoinstall</code><br>
-<code>> sudo kvm-qemu-autoinstall</code>
+> sudo cp kvm-qemu-autoinstall.sh /usr/local/sbin/kvm-qemu-autoinstall</br>
+> sudo chown root:root /usr/local/sbin/kvm-qemu-autoinstall</br>
+> sudo chmod 0755 /usr/local/sbin/kvm-qemu-autoinstall</br>
+> sudo kvm-qemu-autoinstall
 
 ## Image pools & virtual networks
 The script will remove the default image pool and the default network. New ones will be created.
@@ -28,6 +28,9 @@ The script will create the following virtual networks:
 ## Helper scripts
 As an option to this script, a helper scripts bundle can be installed (**-u** parameter). Bundle contains the following scripts:
   * **kvm-guest-actions**: Change guest state, manipulate snapshots and guest virtual disks and check guest basic network info
+  * **kvm-debian-server-unattended**: Unattended installation of Debian Server guest machine, with all required checks and resources
+
+You can find more details on helper scripts at: https://github.com/zjagust/kvm-qemu-install-script/blob/main/resources/README.md
 
 ## Options
 Script has several options (parameters), and without supplying one it will just display help documentation. Following are the parameters:
