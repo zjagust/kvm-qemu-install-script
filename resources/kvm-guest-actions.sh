@@ -233,6 +233,10 @@ function guestState () (
 			else
 				virsh undefine --remove-all-storage "$2"
 			fi
+			# Delete from inventory
+			if [[ -f /etc/libvirt/qemu/installed-guests.csv ]]; then
+				sed -i "/$2/d" /etc/libvirt/qemu/installed-guests.csv
+			fi
 			echo "${I}Guest $2 successfully purged.${R}"
 			echo "${SPACER}"
 		else
