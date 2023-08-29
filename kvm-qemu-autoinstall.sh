@@ -554,6 +554,7 @@ function kvmInstall () {
 	libvirt-daemon \
 	qemu-system-x86 \
 	qemu-utils \
+	dnsmasq-base \
 	virtinst \
 	xsltproc \
 	grepcidr
