@@ -53,6 +53,7 @@ function setOptions () {
 		 ${B}-s:${R} Check swappiness recommendations for your system
 		 ${B}-d:${R} Check I/O scheduler recommendations for your disk devices
 		 ${B}-i:${R} Install KVM QEMU. Recommended to run ${B}-r${R} first
+		 ${B}-u:${R} Install helper scripts. KVM QEMU must be installed first (-i option above)!
 		${SPACER}
 	END
 }
