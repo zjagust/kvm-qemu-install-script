@@ -120,11 +120,12 @@ else
 	systemctl enable resolvconf.service
 fi
 
-# Set Google DNS nameservers
+# DHCP - START Set Google DNS nameservers
 cat <<-EOF > /etc/resolvconf/resolv.conf.d/head
 nameserver 8.8.8.8 
 nameserver 8.8.4.4
 EOF
+# DHCP - END Set Google DNS nameservers
 
 # Restart required services
 if [[ "$OS_VERSION" -ge "12" ]]

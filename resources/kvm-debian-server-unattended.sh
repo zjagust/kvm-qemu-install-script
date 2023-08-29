@@ -348,6 +348,9 @@ function installDebianServer () {
 	cp /etc/libvirt/qemu/late-install/debian-server-late-install.sh /home/webfs/htdocs/debian-server-late-install.sh
 	sed -i "s|GATEWAY|$HOST_GATEWAY|g" /home/webfs/htdocs/debian-server-late-install.sh
 	sed -i "s|HYPER_SSH_ROOT_KEY|$HOST_ROOT_KEY|g" /home/webfs/htdocs/debian-server-late-install.sh
+	if [[ "$7" == "default-nat-static" ]]; then
+		sed -i '/^# DHCP - START/,/^# DHCP - END/{//!d}' /home/webfs/htdocs/debian-server-late-install.sh
+	fi
 	if [[ -z "$SUDO_USER" ]]
 	then
 		echo "${I}Only root is detected, will set host root SSH key only.${R}"
