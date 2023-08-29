@@ -191,7 +191,7 @@ function kvmReadiness () {
 	# Check basic VirtIO kernel module(s)
 	echo "${I}## VIRTIO KERNEL MODULES ##${R}"
 	echo "${SPACER}"
-	if [ "$CONFIG_VIRTIO_MOD" == my ] || [ "$CONFIG_VIRTIO_MOD" == ym ];
+	if [ "$CONFIG_VIRTIO_MOD" == my ] || [ "$CONFIG_VIRTIO_MOD" == ym ] || [ "$CONFIG_VIRTIO_MOD" == m ] || [ "$CONFIG_VIRTIO_MOD" == y ];
 		then
 			echo "${B}Checking if basic VirtIO kernel module(s) is present${R} .......... ${I}[PASSED]${R}"
 			sleep 1
@@ -335,15 +335,15 @@ function kvmSwappiness () {
 	elif [ "$IS_DESKTOP" == true ] && [ "$RAM_IN_GB" -gt 16 ];
 		then 
 			echo "${B}You're running a Desktop system with more than 16 GB RAM. You can set swappiness on 35 by${R}"
-			echo "${B}executing the following commands: \"echo 35 > /proc/sys/vm/swappiness\" and \"sed -i "\\\$a# Set swappiness\\nvm.swappiness=35" /etc/sysctl.conf\"${R}"
+			echo "${B}executing the following commands: \"echo 35 > /proc/sys/vm/swappiness\" and \"sed -i '\$a# Set swappiness\\nvm.swappiness=35' /etc/sysctl.conf\"${R}"
 	elif [ "$IS_DESKTOP" == false ] && [ "$RAM_IN_GB" -le 16 ];
 		then
 			echo "${B}You're running a Server system with 16BG or less RAM. You can set swappiness on 35 by${R}"
-			echo "${B}executing the following commands: \"echo 35 > /proc/sys/vm/swappiness\" and \"sed -i "\\\$a# Set swappiness\\nvm.swappiness=35" /etc/sysctl.conf\"${R}"
+			echo "${B}executing the following commands: \"echo 35 > /proc/sys/vm/swappiness\" and \"sed -i '\$a# Set swappiness\\nvm.swappiness=35' /etc/sysctl.conf\"${R}"
 	else
 		echo "${B}You're running a Server system with at least 16 GB RAM. If you're running services other than KVM and QEMU,${R}"
 		echo "${B}you can set swappiness on 30. If this is a dedicated KVM QEMU server, you can set swappiness on 1${R}"
-		echo "${B}(i.e., \"echo 1 > /proc/sys/vm/swappiness\" and \"sed -i "\\\$a# Set swappiness\\nvm.swappiness=1" /etc/sysctl.conf\").${R}"
+		echo "${B}(i.e., \"echo 1 > /proc/sys/vm/swappiness\" and \"sed -i '\$a# Set swappiness\\nvm.swappiness=1' /etc/sysctl.conf\").${R}"
 	fi
 	echo "${SPACER}"
 
@@ -551,8 +551,8 @@ function kvmInstall () {
 	# Install required packages
 	apt install -y bridge-utils \
 	libvirt-clients \
+	libvirt-daemon-system \
 	libvirt-daemon \
-	qemu \
 	qemu-system-x86 \
 	qemu-utils \
 	virtinst \
