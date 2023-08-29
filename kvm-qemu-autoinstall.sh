@@ -60,7 +60,6 @@ function setOptions () {
 ############################
 ## SET REQUIRED VARIABLES ##
 ############################
-INSTALL_USER="$SUDO_USER"
 VIRT_CORES=$(grep -E -c '(vmx|svm)' /proc/cpuinfo)
 CPU_ARCH=$(grep -E -c ' lm ' /proc/cpuinfo)
 KERNEL_BUILD=$(uname -m)
@@ -575,10 +574,10 @@ function kvmInstall () {
 	fi
 
 	# Add install user to correct groups
-	if [ "$INSTALL_USER" != "root" ]; then
-		usermod -a -G libvirt,kvm "$INSTALL_USER"
-	else
+	if [ -z "$SUDO_USER" ]; then
 		echo "User is root, no group additions."
+	else
+		usermod -a -G libvirt,kvm "$SUDO_USER"
 	fi
 
 	# Action taken on host shutdown
