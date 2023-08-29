@@ -228,6 +228,11 @@ function guestState () (
 			echo "$SPACER"
 			echo "${B}** PURGING GUEST $2 **${R}"
 			echo "$SPACER"
+			# Pull guest IP address
+			PURGE_GUEST_IP=$(virsh domifaddr --source agent "$2" | grep eth0 | awk '{print $4}' | cut -d/ -f1)
+			# Remove managedsave if exists
+			virsh managedsave-remove "$2"
+			# Purge guest and associated storage
 			if [[ "$(virsh list --all | grep "$2" | awk '{print $3}')" == running ]]; then
 				virsh destroy "$2"; virsh undefine --remove-all-storage "$2"
 			else
@@ -236,6 +241,13 @@ function guestState () (
 			# Delete from inventory
 			if [[ -f /etc/libvirt/qemu/installed-guests.csv ]]; then
 				sed -i "/$2/d" /etc/libvirt/qemu/installed-guests.csv
+			fi
+			# Delete key form known-hosts
+			if [[ -z $SUDO_USER ]]; then
+				ssh-keygen -f "/root/.ssh/known_hosts" -R "$PURGE_GUEST_IP"
+			else
+				ssh-keygen -f "/root/.ssh/known_hosts" -R "$PURGE_GUEST_IP"
+				ssh-keygen -f "/home/$SUDO_USER/.ssh/known_hosts" -R "$PURGE_GUEST_IP"
 			fi
 			echo "${I}Guest $2 successfully purged.${R}"
 			echo "${SPACER}"
