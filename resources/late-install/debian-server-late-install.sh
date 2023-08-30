@@ -62,7 +62,9 @@ update-grub
 
 # Export and set LC_MESSAGES
 export LC_MESSAGES=POSIX
+export LC_TIME=C.UTF-8
 update-locale "LC_MESSAGES=POSIX"
+update-locale "LC_TIME=C.UTF-8"
 locale-gen
 
 # Get current interface name
