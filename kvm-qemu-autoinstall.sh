@@ -613,7 +613,7 @@ function kvmInstall () {
 	WEBFSD_PID=$(pidof webfsd)
 	systemctl stop webfs
 	# Required due to bug -> https://www.mail-archive.com/debian-bugs-dist@lists.debian.org/msg1674524.html
-	kill -9 $WEBFSD_PID
+	kill -9 "$WEBFSD_PID"
 	# Create WebFS directories and set proper ownership
 	mkdir -p /home/webfs/{htdocs,logs}
 	touch /home/webfs/logs/access.log
@@ -637,6 +637,10 @@ function kvmInstall () {
 	iptables -I INPUT -m comment --comment "KVM Services" -j KVM-SERVICES
 	iptables -A KVM-SERVICES -p tcp -m tcp -s 172.16.0.0/24 -d "$HOST_GATEWAY" --dport 8880 -m comment --comment "WebFS Access - KVM Default NAT DHCP Network" -j ACCEPT
 	iptables -A KVM-SERVICES -p tcp -m tcp -s 172.17.0.0/24 -d "$HOST_GATEWAY" --dport 8880 -m comment --comment "WebFS Access - KVM Default NAT Static Network" -j ACCEPT
+
+}
+
+function installComplete () {
 	
 	# Display install info message
 	echo "${SPACER}"
@@ -646,6 +650,7 @@ function kvmInstall () {
 	echo "${B}https://github.com/zjagust/kvm-qemu-install-script ${R}"
 	echo "${B}https://zacks.eu/kvm-qemu-installation-configuration ${R}"
 	echo "${SPACER}"
+
 }
 
 ####################################
@@ -905,6 +910,7 @@ while getopts ":hrnzsdiu" option; do
 			kvmInstall
 			poolInstall
 			netInstall
+			installComplete
 			exit
 			;;
 		u) # Install KVM QEMU utils
