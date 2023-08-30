@@ -465,8 +465,7 @@ function installDebianServer () {
 		  ${B}** GUEST LOCALES **${R}
 
 		  Default locales for guest $2 are set to ${B}en_US.UTF-8${R}. If you need to set
-		  additional locales, please run ${B}dpkg-reconfigure locales${R} and select
-		  locales you require.
+		  additional locales, please run ${B}dpkg-reconfigure locales${R} and select locales you require.
 
 		${SPACER}
 
