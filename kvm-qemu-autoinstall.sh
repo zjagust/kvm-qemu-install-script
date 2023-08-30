@@ -458,8 +458,16 @@ function poolInstall () {
 	echo "${SPACER}"
 
 	# Remove default pools
-	virsh pool-destroy default
-	virsh pool-undefine default
+	EXISTING_POOL=$(virsh pool-list --all | tail -n +3 | awk '{print $1}')
+	POOL_STATE=$(virsh pool-list --all | tail -n +3 | awk '{print $2}')
+	if [[ -n "$EXISTING_POOL" && "$POOL_STATE" == "active" ]]; then
+		virsh pool-destroy "$EXISTING_POOL"
+		virsh pool-undefine "$EXISTING_POOL"
+	elif [[ -n "$EXISTING_POOL" && "$POOL_STATE" == "inactive" ]]; then
+		virsh net-undefine "$EXISTING_POOL"
+	else
+		echo "${I}No default pools found, continuing${R}"
+	fi
 
 	# Set default pool
 	virsh pool-define-as default dir - - - - "/home/libvirt/vm_images"
@@ -487,8 +495,16 @@ function netInstall () {
 	echo "${SPACER}"
 
 	# Remove default network
-	virsh net-destroy default
-	virsh net-undefine default
+	EXISTING_NET=$(virsh net-list --all | tail -n +3 | awk '{print $1}')
+	NET_STATE=$(virsh net-list --all | tail -n +3 | awk '{print $2}')
+	if [[ -n "$EXISTING_NET" && "$NET_STATE" == "active" ]]; then
+		virsh net-destroy "$EXISTING_NET"
+		virsh net-undefine "$EXISTING_NET"
+	elif [[ -n "$EXISTING_NET" && "$NET_STATE" == "inactive" ]]; then
+		virsh net-undefine "$EXISTING_NET"
+	else
+		echo "${I}No default networks found, continuing${R}"
+	fi
 
 	# Set default NAT network with DHCP
 	curl -Sso /tmp/default-nat-dhcp.xml https://raw.githubusercontent.com/zjagust/kvm-qemu-install-script/main/networks/default-nat-dhcp.xml
@@ -594,7 +610,10 @@ function kvmInstall () {
 	# Install required packages
 	DEBIAN_FRONTEND=noninteractive aptitude install -R -y webfs
 	# Stop WebFS service
+	WEBFSD_PID=$(pidof webfsd)
 	systemctl stop webfs
+	# Required due to bug -> https://www.mail-archive.com/debian-bugs-dist@lists.debian.org/msg1674524.html
+	kill -9 $WEBFSD_PID
 	# Create WebFS directories and set proper ownership
 	mkdir -p /home/webfs/{htdocs,logs}
 	touch /home/webfs/logs/access.log
