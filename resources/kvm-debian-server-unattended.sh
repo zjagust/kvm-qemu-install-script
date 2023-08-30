@@ -430,6 +430,21 @@ function installDebianServer () {
 
 		${SPACER}
 
+		  ${B}** GUEST LOCALES **${R}
+
+		  Default locales for guest $2 are set to ${B}en_US.UTF-8${R}. If you need to set
+		  additional locales, please run ${B}dpkg-reconfigure locales${R} and select
+		  locales you require.
+
+		${SPACER}
+
+		  ${B}** GUEST TIME ZONE **${R}
+
+		  Default time zone for guest $2 is set to ${B}UTC${R}. If you need to change time zone,
+		  please run ${B}dpkg-reconfigure tzdata${R} and select the required time zone.
+
+		${SPACER}
+
 	END
 	else
 	cat <<-END
@@ -444,6 +459,21 @@ function installDebianServer () {
 		  ROOT PASSWORD: $8
 		  VNC HOST: $HOST_GATEWAY
 		  VNC PORT: 590$VNC_PORT	  
+
+		${SPACER}
+
+		  ${B}** GUEST LOCALES **${R}
+
+		  Default locales for guest $2 are set to ${B}en_US.UTF-8${R}. If you need to set
+		  additional locales, please run ${B}dpkg-reconfigure locales${R} and select
+		  locales you require.
+
+		${SPACER}
+
+		  ${B}** GUEST TIME ZONE **${R}
+
+		  Default time zone for guest $2 is set to ${B}UTC${R}. If you need to change time zone,
+		  please run ${B}dpkg-reconfigure tzdata${R} and select the required time zone.
 
 		${SPACER}
 
