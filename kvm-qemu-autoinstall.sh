@@ -565,7 +565,7 @@ function kvmInstall () {
 	kvmEnvironment
 
 	# Install required packages
-	apt install -y bridge-utils \
+	DEBIAN_FRONTEND=noninteractive aptitude install -y bridge-utils \
 	libvirt-clients \
 	libvirt-daemon-system \
 	libvirt-daemon \
