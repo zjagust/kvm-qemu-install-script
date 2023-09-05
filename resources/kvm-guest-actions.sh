@@ -234,11 +234,21 @@ function guestState () (
 			if [[ "$(virsh list --all | grep "$2" | awk '{print $3}')" == running ]]; then
 				# Pull guest IP address
 				PURGE_GUEST_IP=$(virsh domifaddr --source agent "$2" | grep eth0 | awk '{print $4}' | cut -d/ -f1)
-				virsh destroy "$2"; virsh undefine --remove-all-storage "$2"
+				# Check if nvram is present
+				if [[ -f /var/lib/libvirt/qemu/nvram/"$2"_VARS.fd ]]; then
+					virsh destroy "$2"; virsh undefine --remove-all-storage --nvram "$2"
+				else
+					virsh destroy "$2"; virsh undefine --remove-all-storage "$2"
+				fi
 			else
 				# Pull guest IP address
 				PURGE_GUEST_IP=$(grep "$2" /etc/libvirt/qemu/installed-guests.csv | awk -F"," '{print $3}')
-				virsh undefine --remove-all-storage "$2"
+				# Check if nvram is present
+				if [[ -f /var/lib/libvirt/qemu/nvram/"$2"_VARS.fd ]]; then
+					virsh undefine --remove-all-storage --nvram "$2"
+				else
+					virsh undefine --remove-all-storage "$2"
+				fi
 			fi
 			# Delete from inventory
 			if [[ -f /etc/libvirt/qemu/installed-guests.csv ]]; then
