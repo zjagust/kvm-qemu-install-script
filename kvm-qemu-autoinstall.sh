@@ -573,6 +573,7 @@ function kvmInstall () {
 	qemu-utils \
 	dnsmasq-base \
 	virtinst \
+	ovmf \
 	xsltproc \
 	grepcidr
 
