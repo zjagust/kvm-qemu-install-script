@@ -389,7 +389,7 @@ function installDebianServer () {
 	--cpu host \
 	--machine q35 \
 	--location http://ftp.debian.org/debian/dists/"$6"/main/installer-amd64/ \
-	"$BOOT_MODE" \
+	$BOOT_MODE \
 	--disk path=/home/libvirt/vm_images/"$2".qcow2,bus=scsi,cache=writeback,discard=unmap,format=qcow2 \
 	--console pty,target_type=serial \
 	--initrd-inject=/tmp/preseed.cfg \
