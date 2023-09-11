@@ -55,8 +55,14 @@ function setOptions () {
 		  ${B}5) Debian Distro Name${R} (example: bookworm)
 		  ${B}6) Virtual Network${R} (example: default)
 		  ${B}7) Root Plain Password${R} (example: passpass)
-		  ${B}8) Static IP${R} (This parameter is optional. Use only if non-DHCP virtual network is selected in (6))
+		  ${B}8) Boot Mode${R} (Use either ${B}legacy${R} or ${B}uefi${R})
+		  ${B}9) Static IP${R} (This parameter is optional. Use only if non-DHCP virtual network is selected in (6))
 		  ${B}!! IT IS MANDATORY TO USE ARGUMENTS IN THE ORDER DISPLAYED ABOVE !!${R}
+		${SPACER}
+		${B}DHCP Network, legacy boot mode VM example:${R}
+		  "$0" -i debian-bookwork 10240 2048 1 bookworm default-nat-dhcp passpass legacy
+		${B}Static Network, uefi boot mode VM example:${R}
+		  "$0" -i debian-bookwork 10240 2048 1 bookworm default-nat-static passpass uefi 172.17.0.2
 		${SPACER}
 		The following options are available:
 		 ${B}-h:${R} Print this help message
@@ -321,22 +327,22 @@ function installDebianServer () {
 	if [[ "$7" == "default-nat-static" ]]; then
 		# Set required variables
 		STATIC_RANGE="172.17.0.1/24"
-		CORRECT_IP=$(grepcidr "$STATIC_RANGE" <(echo "$9"))
-		EXISTING_IP=$(grep "$9" /etc/libvirt/qemu/installed-guests.csv | awk -F"," '{print $3}')
+		CORRECT_IP=$(grepcidr "$STATIC_RANGE" <(echo "${10}"))
+		EXISTING_IP=$(grep "${10}" /etc/libvirt/qemu/installed-guests.csv | awk -F"," '{print $3}')
 		if [[ -z "$9" ]]; then
 			echo "${E}You didn't define static ip address, which is mandatory for default-nat-static network.${R}"
 			echo "${I}Please select available IP address from the following range: 172.17.0.2 - 172.17.0.254 .${R}"
 			exit 1
-		elif [[ "$CORRECT_IP" != "$9" ]]; then
+		elif [[ "$CORRECT_IP" != "${10}" ]]; then
 			echo "${E}Incorrect static IP address defined.${R}"
 			echo "${I}Please select available IP address from the following range: 172.17.0.2 - 172.17.0.254 .${R}"
 			exit 1
-		elif [[ "$EXISTING_IP" == "$9" ]]; then
+		elif [[ "$EXISTING_IP" == "${10}" ]]; then
 			echo "${E}Selected IP is already used by another guest${R}"
 			echo "${I}Execute \"$0 -l\" to see which IP addresses are already taken.${R}"
 			exit 1
 		else
-			sed -i "s@d-i netcfg/get_ipaddress string IPADDR@d-i netcfg/get_ipaddress string $9@g" /tmp/preseed.cfg
+			sed -i "s@d-i netcfg/get_ipaddress string IPADDR@d-i netcfg/get_ipaddress string ${10}@g" /tmp/preseed.cfg
 		fi
 	else
 		echo "${I} Network default-nat-dhcp selected, continuing.${R}"
@@ -369,6 +375,13 @@ function installDebianServer () {
 		sed -i "s@#d-i apt-setup/non-free-firmware boolean true@d-i apt-setup/non-free-firmware boolean true@g" /tmp/preseed.cfg
 	fi
 
+	# Set BIOS mode
+	if [[ "$9" == "uefi" ]]; then
+		BOOT_MODE="--boot firmware=efi,firmware.feature0.enabled=no,firmware.feature0.name=secure-boot"
+	else
+		BOOT_MODE="--boot cdrom,hd"
+	fi
+
 	# Start the installation
 	virt-install --connect qemu:///system -n "$2" \
 	-r "$4" \
@@ -376,7 +389,7 @@ function installDebianServer () {
 	--cpu host \
 	--machine q35 \
 	--location http://ftp.debian.org/debian/dists/"$6"/main/installer-amd64/ \
-	--boot cdrom,hd \
+	"$BOOT_MODE" \
 	--disk path=/home/libvirt/vm_images/"$2".qcow2,bus=scsi,cache=writeback,discard=unmap,format=qcow2 \
 	--console pty,target_type=serial \
 	--initrd-inject=/tmp/preseed.cfg \
@@ -385,7 +398,7 @@ function installDebianServer () {
 	-w network="$7",model=virtio \
 	--graphics=none \
 	--virt-type kvm \
-	--video=cirrus \
+	--video=virtio \
 	--memballoon virtio \
 	--noreboot
 
@@ -402,7 +415,7 @@ function installDebianServer () {
 		DHCP_GUEST_IP=$(virsh domifaddr --source agent "$2" | grep eth0 | awk '{print $4}' | cut -d"/" -f1)
 		echo "$2,$8,$DHCP_GUEST_IP,$7" >> /etc/libvirt/qemu/installed-guests.csv
 	else
-		echo "$2,$8,$9,$7" >> /etc/libvirt/qemu/installed-guests.csv
+		echo "$2,$8,${10},$7" >> /etc/libvirt/qemu/installed-guests.csv
 	fi
 
 	# Reset screen
@@ -455,7 +468,7 @@ function installDebianServer () {
 
 		  HOSTNAME: $2
 		  NETWORK: $7
-		  IP ADDRESS: $9
+		  IP ADDRESS: ${10}
 		  ROOT PASSWORD: $8
 		  VNC HOST: $HOST_GATEWAY
 		  VNC PORT: 590$VNC_PORT	  
