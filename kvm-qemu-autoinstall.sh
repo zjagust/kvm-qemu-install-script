@@ -717,7 +717,7 @@ function systemChecks () {
 	fi
 
 	# Check if ca-certificates is installed
-	CA_CERTS_CHECK=$(dpkg -l | grep ca-certificates | awk '{print $1}')
+	CA_CERTS_CHECK=$(dpkg -l | grep -E "(^| )ca-certificates( |$)" | awk '{print $1}')
 	if [[ "$CA_CERTS_CHECK" == "ii" ]]
 	then
 		echo "${I}Ca-certificates are installed.${R}"
