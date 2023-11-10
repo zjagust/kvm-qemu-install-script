@@ -638,6 +638,7 @@ function kvmInstall () {
 	iptables -I INPUT -m comment --comment "KVM Services" -j KVM-SERVICES
 	iptables -A KVM-SERVICES -p tcp -m tcp -s 172.16.0.0/24 -d "$HOST_GATEWAY" --dport 8880 -m comment --comment "WebFS Access - KVM Default NAT DHCP Network" -j ACCEPT
 	iptables -A KVM-SERVICES -p tcp -m tcp -s 172.17.0.0/24 -d "$HOST_GATEWAY" --dport 8880 -m comment --comment "WebFS Access - KVM Default NAT Static Network" -j ACCEPT
+	iptables-save > /etc/iptables/rules.v4
 
 }
 
