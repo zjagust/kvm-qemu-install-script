@@ -398,6 +398,7 @@ function installDebianServer () {
 	--controller type=scsi,model=virtio-scsi \
 	-w network="$7",model=virtio \
 	--graphics=none \
+	--channel unix,mode=bind,target_type=virtio,name=org.qemu.guest_agent.0 \
 	--virt-type kvm \
 	--video=virtio \
 	--memballoon virtio \
