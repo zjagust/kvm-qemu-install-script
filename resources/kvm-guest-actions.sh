@@ -591,7 +591,7 @@ function guestDisk () (
 		echo "${B} ** AVAILABLE IMAGES IN DEFAULT POOL $IMAGES_PATH ** ${R}"
 		echo "${SPACER}"
 		echo "${I}Listing all images in default pool/path $IMAGES_PATH: ${R}"
-		find "$IMAGES_PATH" -type f -name "*.qcow2" |cut -d"/" -f4
+		find "$IMAGES_PATH" -type f -name "*.qcow2" |cut -d"/" -f5
 
 		# List all currently used images
 		echo "${SPACER}"
