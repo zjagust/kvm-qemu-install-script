@@ -142,6 +142,9 @@ fi
 # Install development tools
 aptitude install -R -y linux-headers-amd64 build-essential
 
+# Install drivers
+aptitude install -R -y firmware-linux firmware-linux-free firmware-linux-nonfree
+
 # Install additiona software
 aptitude install -R -y safecat sharutils lynx zip unzip lrzip pbzip2 p7zip p7zip-full rar pigz unrar acpid \
 zstd inotify-tools sysfsutils dstat htop lsscsi iotop nmap ifstat iftop tcptrack whois atop sysstat gpm \
